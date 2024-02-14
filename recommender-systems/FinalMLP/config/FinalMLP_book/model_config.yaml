@@ -1,0 +1,53 @@
+FinalMLP_book:
+    batch_size: 4096
+    dataset_id: FinalMLP_book
+    debug_mode: false
+    early_stop_patience: 2
+    embedding_dim: 10
+    embedding_regularizer: 0.01
+    epochs: 10
+    eval_steps: null
+    feature_specs: null
+    fs1_context: [Age, state, country]
+    fs2_context: [Book-Author, Year-Of-Publication, Publisher, Book-Title_0, Book-Title_1, Book-Title_2, Book-Title_3,
+    Book-Title_4, Book-Title_5, Book-Title_6, Book-Title_7, Book-Title_8, Book-Title_9, Book-Title_10, Book-Title_11,
+    Book-Title_12, Book-Title_13, Book-Title_14, Book-Title_15, Book-Title_16, Book-Title_17, Book-Title_18, Book-Title_19,
+    Book-Title_20, Book-Title_21, Book-Title_22, Book-Title_23, Book-Title_24, Book-Title_25, Book-Title_26, Book-Title_27,
+    Book-Title_28, Book-Title_29, Book-Title_30, Book-Title_31, Book-Title_32, Book-Title_33, Book-Title_34, Book-Title_35,
+    Book-Title_36, Book-Title_37, Book-Title_38, Book-Title_39, Book-Title_40, Book-Title_41, Book-Title_42, Book-Title_43,
+    Book-Title_44, Book-Title_45, Book-Title_46, Book-Title_47, Book-Title_48, Book-Title_49, Book-Title_50, Book-Title_51,
+    Book-Title_52, Book-Title_53, Book-Title_54, Book-Title_55, Book-Title_56, Book-Title_57, Book-Title_58, Book-Title_59,
+    Book-Title_60, Book-Title_61, Book-Title_62, Book-Title_63, Book-Title_64, Book-Title_65, Book-Title_66, Book-Title_67,
+    Book-Title_68, Book-Title_69, Book-Title_70, Book-Title_71, Book-Title_72, Book-Title_73, Book-Title_74, Book-Title_75,
+    Book-Title_76, Book-Title_77, Book-Title_78, Book-Title_79, Book-Title_80, Book-Title_81, Book-Title_82, Book-Title_83,
+    Book-Title_84, Book-Title_85, Book-Title_86]
+    fs_hidden_units: [800]
+    group_id: null
+    learning_rate: 0.001
+    loss: binary_crossentropy
+    metrics: [AUC, logloss]
+    mlp1_batch_norm: true
+    mlp1_dropout: 0.4
+    mlp1_hidden_activations: relu
+    mlp1_hidden_units: [400]
+    mlp2_batch_norm: true
+    mlp2_dropout: 0.2
+    mlp2_hidden_activations: relu
+    mlp2_hidden_units: [800]
+    model: FinalMLP
+    model_id: FinalMLP_default
+    model_root: ./checkpoints/FinalMLP_book/
+    monitor: AUC
+    monitor_mode: max
+    net_regularizer: 0
+    num_heads: 10
+    num_workers: 3
+    optimizer: adam
+    ordered_features: null
+    pickle_feature_encoder: true
+    save_best_only: true
+    seed: 2021
+    shuffle: true
+    task: binary_classification
+    use_fs: true
+    verbose: 1
