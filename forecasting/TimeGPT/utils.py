@@ -5,10 +5,10 @@ import matplotlib.ticker as mtick
 
 
 def plot_model_comparison(dataframe: pd.DataFrame) -> None:
-    """_summary_
-
+    """
+    Bar plot comparison between models
     Args:
-        dataframe (pd.DataFrame): _description_
+        dataframe (pd.DataFrame): data with actuals and forecats for both models
     """
 
     zaai_model = dataframe.drop(columns='TimeGPT')
