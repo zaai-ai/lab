@@ -16,7 +16,7 @@
 
     ├── TimeGPT
     │
-    ├──────── data                      <- videos and audios
+    ├──────── data                      <- dataset
     │
     │──── requirements.txt              <- package version for installing
     │
