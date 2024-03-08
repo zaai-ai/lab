@@ -161,3 +161,4 @@ cython_debug/
 
 data/
 checkpoints/
+model/
