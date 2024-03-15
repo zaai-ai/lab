@@ -19,7 +19,7 @@
     - connection.env
     ```
     DRIVER=psycopg2
-    HOST=postgres
+    HOST=localhost
     PORT=5432     
     DATABASE=postgres
     USERNAME=admin
