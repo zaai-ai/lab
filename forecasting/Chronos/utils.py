@@ -50,7 +50,7 @@ def plot_model_comparison(dataframe: pd.DataFrame) -> None:
         x="Date",
         y="MAPE",
         hue="model",
-        palette=["#dd4fe4", "#070620", "#8a70be", "#fa7302"],
+        palette=["#dd4fe4", "#070620", "#fa7302"],
     )
     plt.title("Comparison between TiDE and Chronos in Walmart data")
     plt.xticks(rotation=45)
