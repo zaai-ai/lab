@@ -8,7 +8,7 @@
 4. Install the required requirements
     - `pip install git+https://github.com/amazon-science/chronos-forecasting.git`
     - `pip install -r requirements.txt`
-5. Create a folder called `/data` under `Chronos/` and add your data
+5. Create a folder called `/data` under `Chronos/` and add your data (https://www.kaggle.com/datasets/aslanahmedov/walmart-sales-forecast/data?select=train.csv)
 6. Run the notebook
 
 ## Folder Structure:

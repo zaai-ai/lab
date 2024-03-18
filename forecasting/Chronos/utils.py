@@ -16,50 +16,43 @@ def plot_model_comparison(dataframe: pd.DataFrame) -> None:
         dataframe (pd.DataFrame): data with actuals and forecats for both models
     """
 
-    tide_model = dataframe.drop(columns="TimeGPT")
+    tide_model = dataframe.rename(
+        columns={"TiDE": "forecast"}
+    )
     tide_model["model"] = "TiDE"
     tide_model["MAPE"] = (
-        abs(tide_model["target"] - tide_model["forecast"]) / tide_model["target"]
+        abs(tide_model["Weekly_Sales"] - tide_model["forecast"]) / tide_model["Weekly_Sales"]
     )
 
-    timegpt_model = dataframe.drop(columns="forecast").rename(
-        columns={"TimeGPT": "forecast"}
-    )
-    timegpt_model["model"] = "TimeGPT"
-    timegpt_model["MAPE"] = (
-        abs(timegpt_model["target"] - timegpt_model["forecast"])
-        / timegpt_model["target"]
-    )
-
-    chronos_tiny_model = dataframe.drop(columns="forecast").rename(
+    chronos_tiny_model = dataframe.rename(
         columns={"Chronos Tiny": "forecast"}
     )
     chronos_tiny_model["model"] = "Chronos Tiny"
     chronos_tiny_model["MAPE"] = (
-        abs(chronos_tiny_model["target"] - chronos_tiny_model["forecast"])
-        / chronos_tiny_model["target"]
+        abs(chronos_tiny_model["Weekly_Sales"] - chronos_tiny_model["forecast"])
+        / chronos_tiny_model["Weekly_Sales"]
     )
 
-    chronos_large_model = dataframe.drop(columns="forecast").rename(
+    chronos_large_model = dataframe.rename(
         columns={"Chronos Large": "forecast"}
     )
     chronos_large_model["model"] = "Chronos Large"
     chronos_large_model["MAPE"] = (
-        abs(chronos_large_model["target"] - chronos_large_model["forecast"])
-        / chronos_large_model["target"]
+        abs(chronos_large_model["Weekly_Sales"] - chronos_large_model["forecast"])
+        / chronos_large_model["Weekly_Sales"]
     )
 
     plt.rcParams["figure.figsize"] = (20, 5)
     ax = sns.barplot(
         data=pd.concat(
-            [tide_model, timegpt_model, chronos_tiny_model, chronos_large_model]
+            [tide_model, chronos_tiny_model, chronos_large_model]
         ),
-        x="delivery_week",
+        x="Date",
         y="MAPE",
         hue="model",
         palette=["#dd4fe4", "#070620", "#8a70be", "#fa7302"],
     )
-    plt.title("Comparison between TiDE, TimeGPT and Chronos in real data")
+    plt.title("Comparison between TiDE and Chronos in Walmart data")
     plt.xticks(rotation=45)
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(1.0))
     plt.show()
@@ -79,7 +72,7 @@ def chronos_forecast(
     """
     # context must be either a 1D tensor, a list of 1D tensors,
     # or a left-padded 2D tensor with batch as the first dimension
-    context = torch.tensor(data["target"].tolist())
+    context = torch.tensor(data["Weekly_Sales"].tolist())
     forecast = model.predict(
         context, horizon
     )  # shape [num_series, num_samples, prediction_length]
@@ -99,7 +92,7 @@ def convert_forecast_to_pandas(
         pd.DataFrame: forecast in pandas format
     """
 
-    forecast_pd = holdout_set[["unique_id", "delivery_week"]]
+    forecast_pd = holdout_set[["unique_id", "Date"]]
     forecast_pd.loc[:, "forecast_lower"] = forecast[0]
     forecast_pd.loc[:, "forecast"] = forecast[1]
     forecast_pd.loc[:, "forecast_upper"] = forecast[2]
@@ -120,19 +113,19 @@ def plot_actuals_forecast(
 
     plt.figure(figsize=(20, 5))
     plt.plot(
-        actuals_data["delivery_week"],
-        actuals_data["target"],
+        actuals_data["Date"],
+        actuals_data["Weekly_Sales"],
         color="royalblue",
         label="historical data",
     )
     plt.plot(
-        forecast_data["delivery_week"],
+        forecast_data["Date"],
         forecast_data["forecast"],
         color="tomato",
         label="median forecast",
     )
     plt.fill_between(
-        forecast_data["delivery_week"],
+        forecast_data["Date"],
         forecast_data["forecast_lower"],
         forecast_data["forecast_upper"],
         color="tomato",
@@ -143,3 +136,38 @@ def plot_actuals_forecast(
     plt.grid()
     plt.title(title)
     plt.show()
+
+
+def transform_predictions_to_pandas(predictions: list, target: str, pred_list: list, quantiles: list) -> pd.DataFrame:
+    """
+    Receives as list of predictions and transform it in a data frame
+    Args:
+        predictions (list): list with predictions
+        target (str): column to forecast
+        pred_list (list): list with test df to extract time series id
+    Returns
+        pd.DataFrame: data frame with date, forecast, forecast_lower, forecast_upper and id
+    """
+
+    pred_df_list = []
+
+    for p, pdf in zip(predictions, pred_list):
+        temp = (
+            p.quantile_df(quantiles[1])
+            .reset_index()
+            .rename(columns={f"{target}_{quantiles[1]}": "forecast"})
+        )
+        temp["forecast_lower"] = p.quantile_df(quantiles[0]).reset_index()[f"{target}_{quantiles[0]}"]
+        temp["forecast_upper"] = p.quantile_df(quantiles[2]).reset_index()[f"{target}_{quantiles[2]}"]
+
+        # add unique id
+        temp["unique_id"] = str(int(list(pdf.static_covariates_values())[0][0]))+'-'+str(int(list(pdf.static_covariates_values())[0][1]))
+
+        # convert negative predictions into 0
+        temp[["forecast", "forecast_lower", "forecast_upper"]] = temp[
+            ["forecast", "forecast_lower", "forecast_upper"]
+        ].clip(lower=0)
+
+        pred_df_list.append(temp)
+
+    return pd.concat(pred_df_list)
