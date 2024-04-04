@@ -12,7 +12,6 @@ def preprocess_dataset(dataframe: pd.DataFrame, dynamic_cov: list, time_col: str
     Receives the raw dataframe and creates:
         - unique id column
         - make dynamic start dates for each series based on the first date where visits is different than 0
-        - create 4 static covariates based on the type of tourism
     Args:
         dataframe (pd.DataFrame): raw data
         dynamic_cov (list): column names with dynamic cov
@@ -37,12 +36,6 @@ def preprocess_dataset(dataframe: pd.DataFrame, dynamic_cov: list, time_col: str
     
     # join dynamic cov
     cleaned_df = pd.merge(cleaned_df, dynamic_cov_df, on=[time_col], how='left')
-    
-    # extract static covariates
-    cleaned_df['static_1'] = cleaned_df['unique_id'].apply(lambda x: x[0])
-    cleaned_df['static_2'] = cleaned_df['unique_id'].apply(lambda x: x[1])
-    cleaned_df['static_3'] = cleaned_df['unique_id'].apply(lambda x: x[2])
-    cleaned_df['static_4'] = cleaned_df['unique_id'].apply(lambda x: x[3:])
     
     return cleaned_df
 
