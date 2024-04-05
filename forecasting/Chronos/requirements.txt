@@ -6,3 +6,4 @@ u8darts[all]==0.26.0
 dask-expr==1.0
 dask==2024.3.0
 seaborn==0.13.2
+datasets==2.18.0
