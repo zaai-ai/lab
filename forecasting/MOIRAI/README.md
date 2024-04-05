@@ -8,14 +8,15 @@
 4. Install the required requirements
     - `pip install git+https://github.com/SalesforceAIResearch/uni2ts`
     - `pip install -r requirements.txt`
-5. Run the notebook
+5. Create a folder called `data/` to store the resul
+6. Run the notebook
 
 ## Folder Structure:
 ------------
 
     ├── MOIRAI
     │
-    ├──────── input_data_and_results    <- dataset and results
+    ├──── data                          <- results
     │
     │──── requirements.txt              <- package version for installing
     │
