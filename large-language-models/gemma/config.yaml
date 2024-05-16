@@ -1,6 +1,6 @@
 generator:
   llama:
-    llm_path: "model/nous-hermes-llama-2-7b.Q4_K_M.gguf"
+    llm_path: "model/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf"
   mistral:
     llm_path: "model/mistral-7b-instruct-v0.1.Q4_K_M.gguf"
   gemma:
