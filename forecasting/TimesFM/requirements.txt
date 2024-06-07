@@ -1,0 +1,7 @@
+numpy==1.26.4
+pandas==2.2.2
+seaborn==0.13.2
+datasets==2.18.0
+git+https://github.com/google-research/timesfm.git
+jaxlib==0.4.26
+utilsforecast==0.1.10
