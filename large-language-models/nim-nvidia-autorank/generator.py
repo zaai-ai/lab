@@ -1,13 +1,12 @@
 from langchain import PromptTemplate
-from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
+from langchain_openai import ChatOpenAI
 
 
 class Generator:
     """Generator, aka LLM, to provide an answer based on some question and context"""
 
     def __init__(self, model: str, ngc_key: str) -> None:
-
         # template
         self.template = """
             Use the following pieces of context to give a succinct and clear answer to the question at the end:
@@ -21,7 +20,8 @@ class Generator:
             base_url="https://integrate.api.nvidia.com/v1",
             api_key=ngc_key,
             model=model,
-            temperature=0.1)
+            temperature=0.1,
+        )
 
         # create prompt template
         self.prompt = PromptTemplate(
@@ -43,8 +43,6 @@ class Generator:
             llm_kwargs={"max_tokens": 2000},
         )
 
-        answer = query_llm.invoke(
-            {"context": context, "question": question}
-        )
-        
-        return answer['text']
+        answer = query_llm.invoke({"context": context, "question": question})
+
+        return answer["text"]

@@ -72,21 +72,15 @@ def get_gpt_rank(true_answer: str, llm_answers: dict, openai_key: str) -> list:
         2 {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['mistral7b'])}
         3 {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['llama70b'])}
         4 {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['mixtral'])}"""
-    
-    client = OpenAI(
-        api_key=openai_key,
-    )
 
-    completion = client.chat.completions.create(
+    completion = OpenAI(api_key=openai_key).chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": gpt_query}],
         functions=functions,
         function_call={"name": "return_rank"},
     )
     response_message = completion.choices[0].message.function_call.arguments
-    rank = ast.literal_eval(response_message)[
-        "rank"
-    ].split(",")
+    rank = ast.literal_eval(response_message)["rank"].split(",")
     if len(rank) == 1:
         rank = list(rank[0])
 
