@@ -68,10 +68,10 @@ def get_gpt_rank(true_answer: str, llm_answers: dict, openai_key: str) -> list:
     functions = define_open_ai_function()
 
     gpt_query = f"""Based on the correct answer: {true_answer}, rank the IDs of the following four answers from the most to the least correct one:
-        1 {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['llama8b'])}
-        2 {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['mistral7b'])}
-        3 {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['llama70b'])}
-        4 {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['mixtral'])}"""
+        ID: 1 Answer: {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['llama8b'])}
+        ID: 2 Answer: {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['mistral7b'])}
+        ID: 3 Answer: {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['llama70b'])}
+        ID: 4 Answer: {re.sub("[^a-zA-Z0-9']+", ' ', llm_answers['mixtral'])}"""
 
     completion = OpenAI(api_key=openai_key).chat.completions.create(
         model="gpt-3.5-turbo",
