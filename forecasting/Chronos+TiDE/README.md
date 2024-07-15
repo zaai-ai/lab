@@ -1,6 +1,3 @@
-# ZAAI
-Curricular Internship at ZAAI
-
 # Summary
 The goal of this project is to compared the models to a hybrid combination of both of them to see if an improved prediction can be made.
 The models used are:
