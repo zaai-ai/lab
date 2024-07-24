@@ -11,6 +11,14 @@ import torch
 
 
 def combine_predictions(forecast: pd.DataFrame, residuals_forecast: pd.DataFrame) -> pd.DataFrame:
+    """
+    Combine the forecast and residuals forecast dataframes
+    Args:
+        forecast (pd.DataFrame): forecast dataframe
+        residuals_forecast (pd.DataFrame): residuals forecast dataframe
+    Returns:
+        pd.DataFrame: combined forecast dataframe
+    """
     # Concatenate the two dataframes
     combined_df = pd.concat([forecast, residuals_forecast])
 
@@ -67,6 +75,16 @@ def convert_forecast_to_pandas(
 
 def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, forecast_horizon: int,
                               dynamic_covariates_names) -> list:
+    """
+    Create dynamic covariates for each series in the training set
+    Args:
+        train_darts (list): list with training series
+        dataframe (pd.DataFrame): historical data
+        forecast_horizon (int): forecast horizon
+        dynamic_covariates_names (list): list with dynamic covariates names
+    Returns:
+        list: list with dynamic covariates for each series
+    """
     dynamic_covariates = []
 
     # Ensure the Date column is in datetime format in both dataframes
@@ -105,6 +123,15 @@ def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, foreca
 
 
 def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str) -> list:
+    """
+    Calculate the Mean Absolute Percentage Error (MAPE) for each week
+    Args:
+        prediction (pd.DataFrame): forecast data
+        actuals (pd.DataFrame): actual data
+        target (str): target column
+    Returns:
+        list: list with MAPE values for each week
+    """
     # Convert 'Date' columns to datetime if they aren't already
     prediction['Date'] = pd.to_datetime(prediction['Date'])
     actuals['Date'] = pd.to_datetime(actuals['Date'])
@@ -118,15 +145,25 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
                                 prediction_w_mape[target]
 
     # Group by 'Date' and calculate the mean MAPE for each group
-    weekly_mape = prediction_w_mape.groupby('Date')['MAPE'].mean().tolist()
+    mape = prediction_w_mape.groupby('Date')['MAPE'].mean().tolist()
 
     # Ensuring the list is rounded to two decimal places
-    weekly_mape = [round(x, 2) for x in weekly_mape]
+    mape = [round(x, 2) for x in mape]
 
-    return weekly_mape
+    return mape
 
 
 def plot_model_comparison(model_names, model_forecasts, actuals, forecast_horizon, target, top=None):
+    """
+    Plot the Mean Absolute Percentage Error (MAPE) for each model by month
+    Args:
+        model_names (list): list of model names
+        model_forecasts (list): list of model forecasts
+        actuals (pd.DataFrame): actual sales data
+        forecast_horizon (int): forecast horizon
+        target (str): target column
+        top (pd.DataFrame): top performing model
+    """
     if len(model_forecasts) != len(model_names):
         raise ValueError("The number of model forecasts must match the number of model names")
 
@@ -169,7 +206,7 @@ def plot_model_comparison(model_names, model_forecasts, actuals, forecast_horizo
     plt.show()
 
 
-def transform_predictions_to_pandas(predictions, target: str, pred_list: list, quantiles: list,
+def transform_predictions_to_pandas(predictions: list, target: str, pred_list: list, quantiles: list,
                                     convert: bool = True) -> pd.DataFrame:
     """
     Receives as list of predictions and transform it in a data frame
@@ -177,6 +214,8 @@ def transform_predictions_to_pandas(predictions, target: str, pred_list: list, q
         predictions (list): list with predictions
         target (str): column to forecast
         pred_list (list): list with test df to extract time series id
+        quantiles (list): list with quantiles
+        convert (bool): convert negative predictions into 0 (default is True)
     Returns
         pd.DataFrame: data frame with date, forecast, forecast_lower, forecast_upper and id
         :param convert:
@@ -211,54 +250,3 @@ def transform_predictions_to_pandas(predictions, target: str, pred_list: list, q
         pred_df_list.append(temp)
 
     return pd.concat(pred_df_list)
-
-
-def plot_multiple_forecasts(
-        actuals_data: pd.DataFrame, forecast_data_list: list, title: str, y_label: str, x_label: str,
-        forecast_horizon: int, target: str, interval: bool = False, top: pd.DataFrame = None
-) -> None:
-    # Filter data for top 10 stores if provided
-    if top is not None:
-        actuals_data = actuals_data[actuals_data['unique_id'].isin(top['unique_id'])]
-        forecast_data_list = [(fd[fd['unique_id'].isin(top['unique_id'])], name)
-                              for fd, name in forecast_data_list]
-
-    # Define a list of colors for each model
-    colors = ['tomato', 'forestgreen', 'royalblue', 'purple', 'yellow', 'orange', 'pink', 'brown', 'grey', 'cyan']
-
-    # Cut the actuals_data to include only relevant weeks
-    actuals_data = actuals_data[
-        actuals_data['Date'] >= actuals_data['Date'].max() - pd.DateOffset(months=forecast_horizon + 3)]
-
-    plt.figure(figsize=(20, 5))
-    plt.plot(
-        actuals_data["Date"],
-        actuals_data[target],
-        color="black",
-        label="Historical Data",
-    )
-
-    for i, (forecast_data, model_name) in enumerate(forecast_data_list):
-        plt.plot(
-            forecast_data["Date"],
-            forecast_data["forecast"],
-            color=colors[i],
-            label=model_name + " Forecast",
-        )
-
-        if interval:
-            plt.fill_between(
-                forecast_data["Date"],
-                forecast_data["forecast_lower"],
-                forecast_data["forecast_upper"],
-                color=colors[i],
-                alpha=0.3,
-                label=model_name + " 80% Prediction Interval",
-            )
-
-    plt.ylabel(y_label)
-    plt.xlabel(x_label)
-    plt.title(title)
-    plt.legend()
-    plt.grid()
-    plt.show()
