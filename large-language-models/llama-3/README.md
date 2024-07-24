@@ -9,13 +9,19 @@
 `pip install -r requirements.txt`
 4. Download Llama 3 8B model `Meta-Llama-3-8B-Instruct-Q4_K_M.gguf` from https://huggingface.co/NousResearch/Meta-Llama-3-8B-Instruct-GGUF/tree/main and add it to `llama-3/model/`
 5. Download Llama 2 7B model `nous-hermes-llama-2-7b.Q4_K_M.gguf` from https://huggingface.co/TheBloke/Nous-Hermes-Llama-2-7B-GGUF and add it to `llama-3/model/`
-6. Run in the notebook `llama.ipynb` 
+6. Create a folder called /env under llama-3/ and add a file with the following:
+    - var.env
+    ```
+    OPENAI_KEY=YOUR_OPENAI_KEY
+    ```
+7. Run in the notebook `llama.ipynb` 
 
 ## Folder Structure:
 ------------
 
     ├── llama-3
     │
+    ├────────── env                                           <- Environment Varaibles
     ├────────── base                                          <- Configuration class
     ├────────── generator                                     <- Generator class
     ├────────── model                                         <- GGUF models
