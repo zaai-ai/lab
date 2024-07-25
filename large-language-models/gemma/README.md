@@ -10,13 +10,19 @@
 4. Download Mistral 7B model `mistral-7b-instruct-v0.1.Q4_K_M.gguf` from https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGUF/tree/main and add it to `gemma/model/`
 5. Download Llama 3 8B model Meta-Llama-3-8B-Instruct-Q4_K_M.gguf from https://huggingface.co/NousResearch/Meta-Llama-3-8B-Instruct-GGUF/tree/main and add it to `gemma/model/`
 6. Download Gemma 7B model `gemma-7b-it-Q4_K_M.gguf` from https://huggingface.co/rahuldshetty/gemma-7b-it-gguf-quantized/tree/main and add it to `gemma/model/`
-7. Run in the notebook `gemma.ipynb` 
+7. Create a folder called /env under llama-3/ and add a file with the following:
+    - var.env
+    ```
+    OPENAI_KEY=YOUR_OPENAI_KEY
+    ```
+8. Run in the notebook `gemma.ipynb` 
 
 ## Folder Structure:
 ------------
 
     ├── gemma
     │
+    ├────────── env                                           <- Environment Varaibles
     ├────────── base                                          <- Configuration class
     ├────────── generator                                     <- Generator class
     ├────────── model                                         <- GGUF models
