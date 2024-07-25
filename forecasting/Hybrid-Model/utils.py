@@ -1,15 +1,18 @@
-from darts.utils.timeseries_generation import datetime_attribute_timeseries
-from darts.dataprocessing.transformers import MissingValuesFiller
-from chronos import ChronosPipeline
-import matplotlib.pyplot as plt
-from darts import TimeSeries
 from typing import Tuple
-import pandas as pd
+
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import torch
+from chronos import ChronosPipeline
+from darts import TimeSeries
+from darts.dataprocessing.transformers import MissingValuesFiller
+from darts.utils.timeseries_generation import datetime_attribute_timeseries
 
 
-def combine_predictions(forecast: pd.DataFrame, residuals_forecast: pd.DataFrame) -> pd.DataFrame:
+def combine_predictions(
+    forecast: pd.DataFrame, residuals_forecast: pd.DataFrame
+) -> pd.DataFrame:
     """
     Combine the forecast and residuals forecast dataframes
     Args:
@@ -22,15 +25,15 @@ def combine_predictions(forecast: pd.DataFrame, residuals_forecast: pd.DataFrame
     combined_df = pd.concat([forecast, residuals_forecast])
 
     # Group by 'unique_id' and TIME_COL and sum the forecast values
-    return combined_df.groupby(['unique_id', "Date"]).agg({
-        'forecast_lower': 'sum',
-        'forecast': 'sum',
-        'forecast_upper': 'sum'
-    }).reset_index()
+    return (
+        combined_df.groupby(["unique_id", "Date"])
+        .agg({"forecast_lower": "sum", "forecast": "sum", "forecast_upper": "sum"})
+        .reset_index()
+    )
 
 
 def chronos_forecast(
-        model: ChronosPipeline, data: pd.DataFrame, horizon: int, target: str
+    model: ChronosPipeline, data: pd.DataFrame, horizon: int, target: str
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Generates forecast with Chronos
@@ -53,7 +56,7 @@ def chronos_forecast(
 
 
 def convert_forecast_to_pandas(
-        forecast: list, holdout_set: pd.DataFrame
+    forecast: list, holdout_set: pd.DataFrame
 ) -> pd.DataFrame:
     """
     Convert forecast to pandas data frame
@@ -72,8 +75,12 @@ def convert_forecast_to_pandas(
     return forecast_pd
 
 
-def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, forecast_horizon: int,
-                              dynamic_covariates_names) -> list:
+def create_dynamic_covariates(
+    train_darts: list,
+    dataframe: pd.DataFrame,
+    forecast_horizon: int,
+    dynamic_covariates_names,
+) -> list:
     """
     Create dynamic covariates for each series in the training set
     Args:
@@ -87,14 +94,16 @@ def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, foreca
     dynamic_covariates = []
 
     # Ensure the Date column is in datetime format in both dataframes
-    dataframe['Date'] = pd.to_datetime(dataframe['Date'])
+    dataframe["Date"] = pd.to_datetime(dataframe["Date"])
 
     for serie in train_darts:
         # Extract the unique_id from the series to filter the DataFrame
-        unique_id = "".join(str(serie.static_covariates[key].item()) for key in serie.static_covariates)
+        unique_id = "".join(
+            str(serie.static_covariates[key].item()) for key in serie.static_covariates
+        )
 
         # Filter the DataFrame for the current series based on unique_id
-        filtered_df = dataframe[dataframe['unique_id'] == unique_id]
+        filtered_df = dataframe[dataframe["unique_id"] == unique_id]
 
         # Generate time-related covariates
         covariate = datetime_attribute_timeseries(
@@ -102,7 +111,7 @@ def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, foreca
             attribute="month",
             one_hot=True,
             cyclic=False,
-            add_length=forecast_horizon
+            add_length=forecast_horizon,
         )
 
         # Add dynamic covariates that need interpolation
@@ -111,7 +120,7 @@ def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, foreca
             time_col="Date",
             value_cols=dynamic_covariates_names,
             freq=serie.freq,
-            fill_missing_dates=True
+            fill_missing_dates=True,
         )
 
         covariate = covariate.stack(MissingValuesFiller().transform(dyn_cov_interp))
@@ -121,7 +130,9 @@ def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, foreca
     return dynamic_covariates
 
 
-def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str) -> list:
+def mape_evaluation(
+    prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
+) -> list:
     """
     Calculate the Mean Absolute Percentage Error (MAPE) for each week
     Args:
@@ -132,18 +143,25 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
         list: list with MAPE values for each week
     """
     # Convert 'Date' columns to datetime if they aren't already
-    prediction['Date'] = pd.to_datetime(prediction['Date'])
-    actuals['Date'] = pd.to_datetime(actuals['Date'])
+    prediction["Date"] = pd.to_datetime(prediction["Date"])
+    actuals["Date"] = pd.to_datetime(actuals["Date"])
 
     # Merging prediction and actual sales data on 'Date' and 'unique_id'
-    prediction_w_mape = pd.merge(prediction, actuals[['Date', target, 'unique_id']],
-                                 on=['Date', 'unique_id'], how='left')
+    prediction_w_mape = pd.merge(
+        prediction,
+        actuals[["Date", target, "unique_id"]],
+        on=["Date", "unique_id"],
+        how="left",
+    )
 
     # Calculating MAPE
-    prediction_w_mape['MAPE'] = abs(prediction_w_mape['forecast'] - prediction_w_mape[target]) / prediction_w_mape[target]
+    prediction_w_mape["MAPE"] = (
+        abs(prediction_w_mape["forecast"] - prediction_w_mape[target])
+        / prediction_w_mape[target]
+    )
 
     # Group by 'Date' and calculate the mean MAPE for each group
-    mape = prediction_w_mape.groupby('Date')['MAPE'].mean().tolist()
+    mape = prediction_w_mape.groupby("Date")["MAPE"].mean().tolist()
 
     # Ensuring the list is rounded to two decimal places
     mape = [round(x, 2) for x in mape]
@@ -151,8 +169,14 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
     return mape
 
 
-def plot_model_comparison(model_names: list, model_forecasts: list, actuals: pd.DataFrame, forecast_horizon: int,
-                          target: str, top: pd.DataFrame = None):
+def plot_model_comparison(
+    model_names: list,
+    model_forecasts: list,
+    actuals: pd.DataFrame,
+    forecast_horizon: int,
+    target: str,
+    top: pd.DataFrame = None,
+):
     """
     Plot the Mean Absolute Percentage Error (MAPE) for each model by month
     Args:
@@ -164,7 +188,9 @@ def plot_model_comparison(model_names: list, model_forecasts: list, actuals: pd.
         top (pd.DataFrame): top performing model
     """
     if len(model_forecasts) != len(model_names):
-        raise ValueError("The number of model forecasts must match the number of model names")
+        raise ValueError(
+            "The number of model forecasts must match the number of model names"
+        )
 
     num_windows = len(model_forecasts[0])
     iteration_mapes = np.zeros((forecast_horizon, len(model_names)))
@@ -173,12 +199,18 @@ def plot_model_comparison(model_names: list, model_forecasts: list, actuals: pd.
     for model_idx, forecasts in enumerate(model_forecasts):
         for time_window_idx in range(num_windows):
             # Select the correct prediction and actuals based on whether filtering is needed
-            model_prediction = forecasts if num_windows == 1 else forecasts[time_window_idx]
+            model_prediction = (
+                forecasts if num_windows == 1 else forecasts[time_window_idx]
+            )
             actual_window = actuals if num_windows == 1 else actuals[time_window_idx]
 
             if top is not None:
-                model_prediction = model_prediction[model_prediction['unique_id'].isin(top['unique_id'])]
-                actual_window = actual_window[actual_window['unique_id'].isin(top['unique_id'])]
+                model_prediction = model_prediction[
+                    model_prediction["unique_id"].isin(top["unique_id"])
+                ]
+                actual_window = actual_window[
+                    actual_window["unique_id"].isin(top["unique_id"])
+                ]
 
             mape_values = mape_evaluation(model_prediction, actual_window, target)
             iteration_mapes[:, model_idx] += np.array(mape_values)
@@ -190,23 +222,34 @@ def plot_model_comparison(model_names: list, model_forecasts: list, actuals: pd.
     indices = np.arange(forecast_horizon)
     bar_width = 0.1
 
-    colors = ['#e854dc', '#ff7404', 'royalblue']
+    colors = ["#e854dc", "#ff7404", "royalblue"]
 
     for i, model in enumerate(model_names):
-        ax.bar(indices + i * bar_width, iteration_mapes[:, i], width=bar_width, label=model, color=colors[i])
+        ax.bar(
+            indices + i * bar_width,
+            iteration_mapes[:, i],
+            width=bar_width,
+            label=model,
+            color=colors[i],
+        )
 
-    ax.set_xlabel('Month')
-    ax.set_ylabel('Mean MAPE')
-    ax.set_title('Mean MAPE by Model and Month')
-    ax.set_yticklabels(['{:.0f}%'.format(x * 100) for x in ax.get_yticks()])
+    ax.set_xlabel("Month")
+    ax.set_ylabel("Mean MAPE")
+    ax.set_title("Mean MAPE by Model and Month")
+    ax.set_yticklabels(["{:.0f}%".format(x * 100) for x in ax.get_yticks()])
     ax.set_xticks(indices + bar_width * (len(model_names) - 1) / 2)
-    ax.set_xticklabels([f'Month {i + 1}' for i in range(forecast_horizon)])
+    ax.set_xticklabels([f"Month {i + 1}" for i in range(forecast_horizon)])
     ax.legend()
     plt.show()
 
 
-def transform_predictions_to_pandas(predictions: list, target: str, pred_list: list, quantiles: list,
-                                    convert: bool = True) -> pd.DataFrame:
+def transform_predictions_to_pandas(
+    predictions: list,
+    target: str,
+    pred_list: list,
+    quantiles: list,
+    convert: bool = True,
+) -> pd.DataFrame:
     """
     Receives as list of predictions and transform it in a data frame
     Args:
@@ -228,11 +271,17 @@ def transform_predictions_to_pandas(predictions: list, target: str, pred_list: l
             .reset_index()
             .rename(columns={f"{target}_{quantiles[1]}": "forecast"})
         )
-        temp["forecast_lower"] = p.quantile_df(quantiles[0]).reset_index()[f"{target}_{quantiles[0]}"]
-        temp["forecast_upper"] = p.quantile_df(quantiles[2]).reset_index()[f"{target}_{quantiles[2]}"]
+        temp["forecast_lower"] = p.quantile_df(quantiles[0]).reset_index()[
+            f"{target}_{quantiles[0]}"
+        ]
+        temp["forecast_upper"] = p.quantile_df(quantiles[2]).reset_index()[
+            f"{target}_{quantiles[2]}"
+        ]
 
         # add unique id
-        unique_id = "".join(str(pdf.static_covariates[key].item()) for key in pdf.static_covariates)
+        unique_id = "".join(
+            str(pdf.static_covariates[key].item()) for key in pdf.static_covariates
+        )
 
         temp["unique_id"] = unique_id
 
@@ -243,7 +292,9 @@ def transform_predictions_to_pandas(predictions: list, target: str, pred_list: l
             ].clip(lower=0)
 
         # Reorder columns to make unique_id the first column
-        columns_order = ['unique_id'] + [col for col in temp.columns if col != 'unique_id']
+        columns_order = ["unique_id"] + [
+            col for col in temp.columns if col != "unique_id"
+        ]
         temp = temp[columns_order]
 
         pred_df_list.append(temp)
