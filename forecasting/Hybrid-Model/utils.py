@@ -1,6 +1,5 @@
 from darts.utils.timeseries_generation import datetime_attribute_timeseries
 from darts.dataprocessing.transformers import MissingValuesFiller
-from sklearn.metrics import root_mean_squared_error
 from chronos import ChronosPipeline
 import matplotlib.pyplot as plt
 from darts import TimeSeries
@@ -141,8 +140,7 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
                                  on=['Date', 'unique_id'], how='left')
 
     # Calculating MAPE
-    prediction_w_mape['MAPE'] = abs(prediction_w_mape['forecast'] - prediction_w_mape[target]) / \
-                                prediction_w_mape[target]
+    prediction_w_mape['MAPE'] = abs(prediction_w_mape['forecast'] - prediction_w_mape[target]) / prediction_w_mape[target]
 
     # Group by 'Date' and calculate the mean MAPE for each group
     mape = prediction_w_mape.groupby('Date')['MAPE'].mean().tolist()
@@ -153,7 +151,8 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
     return mape
 
 
-def plot_model_comparison(model_names, model_forecasts, actuals, forecast_horizon, target, top=None):
+def plot_model_comparison(model_names: list, model_forecasts: list, actuals: pd.DataFrame, forecast_horizon: int,
+                          target: str, top: pd.DataFrame = None):
     """
     Plot the Mean Absolute Percentage Error (MAPE) for each model by month
     Args:
@@ -194,7 +193,7 @@ def plot_model_comparison(model_names, model_forecasts, actuals, forecast_horizo
     colors = ['#e854dc', '#ff7404', 'royalblue']
 
     for i, model in enumerate(model_names):
-        ax.bar(indices + i * bar_width, iteration_mapes[:, i], width=bar_width, label=model,color=colors[i])
+        ax.bar(indices + i * bar_width, iteration_mapes[:, i], width=bar_width, label=model, color=colors[i])
 
     ax.set_xlabel('Month')
     ax.set_ylabel('Mean MAPE')
