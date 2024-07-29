@@ -1,0 +1,10 @@
+generator:
+  llama:
+    llm_path: "model/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf"
+  mistral:
+    llm_path: "model/mistral-7b-instruct-v0.1.Q4_K_M.gguf"
+  gemma:
+    llm_path: "model/gemma-7b-it-Q4_K_M.gguf"
+  context_length: 1024
+  temperature: 0.7
+  max_tokens: 2000
