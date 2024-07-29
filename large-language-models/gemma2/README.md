@@ -14,7 +14,7 @@
     ```
     OPENAI_KEY=YOUR_OPENAI_KEY
     ```
-7. Run in the notebook `Experiments.ipynb` 
+7. Run in the notebook `gemma2.ipynb` 
 
 ## Folder Structure:
 ------------
@@ -27,7 +27,7 @@
     │
     │────────── config.yaml                                   <- Config definition
     │
-    │────────── gemma.ipynb                                   <- notebook
+    │────────── gemma2.ipynb                                  <- notebook
     │────────── utils                                         <- helper functions
     │
     └──────── requirements.txt                                <- package versions
