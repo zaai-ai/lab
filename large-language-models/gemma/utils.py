@@ -18,7 +18,7 @@ def get_llm_response(
         context: context data
         query: question
     Returns:
-        Tuple[str, int, int]: answer, words_per_second, words
+        answer, words_per_second, words
     """
 
     init_time = time.time()
@@ -55,11 +55,11 @@ def get_gpt_rank(true_answer: str, llm_answers: dict, openai_key: str) -> list:
     """
     Based on the true answer, it uses GPT-3.5 to rank the answers of the LLMs
     Args:
-        true_answer (str): correct answer
-        llm_answers (dict): LLM answers
-        openai_key (str): open ai key
+        true_answer: correct answer
+        llm_answers: LLM answers
+        openai_key: open ai key
     Returns:
-        list: rank of LLM IDs
+        rank of LLM IDs
     """
 
     # get a formated output from OpenAI
