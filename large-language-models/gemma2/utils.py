@@ -11,11 +11,11 @@ def get_llm_response(model: Generator, context: str, query: str) -> Tuple[str, f
     Generates an answer from a given LLM based on context and query
     returns the answer and the number of words per second and the total number of words
     Args:
-        model (_type_): LLM
-        context (str): context data
-        query (str): question
+        model: LLM
+        context: context data
+        query: question
     Returns:
-        Tuple[str, int, int]: answer, words_per_second, words
+        answer, words_per_second, words
     """
 
     init_time = time.time()
@@ -30,7 +30,7 @@ def define_open_ai_function() -> list:
     """
     Create OpenAI function to parse GPT answer
     Returns:
-        list: functions to parse gpt answer
+        functions to parse gpt answer
     """
 
     return [
@@ -51,11 +51,11 @@ def get_gpt_rank(true_answer: str, llm_answers: dict, openai_key: str) -> list:
     """
     Implements RAQ core: based on the true answer, it uses GPT-3.5 to rank the answers of the LLMs
     Args:
-        true_answer (str): correct answer
-        llm_answers (dict): LLM answers
-        openai_key (str): open ai key
+        true_answer: correct answer
+        llm_answers: LLM answers
+        openai_key: open ai key
     Returns:
-        list: rank of LLM IDs
+        rank of LLM IDs
     """
 
     # get a formatted output from OpenAI
@@ -75,5 +75,12 @@ def get_gpt_rank(true_answer: str, llm_answers: dict, openai_key: str) -> list:
     rank = ast.literal_eval(response_message)["rank"].split(",")
     if len(rank) == 1:
         rank = list(rank[0])
+    
+    # in case GPT 3.5 only answers with a single ID
+    # we consider as the closest one
+    if '1' not in rank and '2' in rank:
+        rank.insert(1, '1')
+    elif '2' not in rank and '1' in rank:
+        rank.insert(1, '2')
 
     return rank
