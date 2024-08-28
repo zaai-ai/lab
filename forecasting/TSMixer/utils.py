@@ -86,7 +86,14 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
     return weekly_mape
 
 
-def plot_model_comparison(model_names, model_forecasts, actuals, forecast_horizon, target, top=None):
+def plot_model_comparison(
+    model_names: list,
+    model_forecasts: list,
+    actuals: pd.DataFrame,
+    forecast_horizon: int,
+    target: str,
+    top: pd.DataFrame = None,
+):
     """
     Plot the Mean Absolute Percentage Error (MAPE) for each model by month
     Args:
@@ -141,8 +148,13 @@ def plot_model_comparison(model_names, model_forecasts, actuals, forecast_horizo
     plt.show()
 
 
-def transform_predictions_to_pandas(predictions, target: str, pred_list: list, quantiles: list,
-                                    convert: bool = True) -> pd.DataFrame:
+def transform_predictions_to_pandas(
+    predictions: list,
+    target: str,
+    pred_list: list,
+    quantiles: list,
+    convert: bool = True,
+) -> pd.DataFrame:
     """
     Receives as list of predictions and transform it in a data frame
     Args:
