@@ -55,16 +55,19 @@ def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, foreca
     return dynamic_covariates
 
 
-def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str) -> list:
+def mape_evaluation(
+        prediction: pd.DataFrame,
+        actuals: pd.DataFrame,
+        target: str) -> list:
     """
-        Calculate the Mean Absolute Percentage Error (MAPE) for each week
-        Args:
-            prediction (pd.DataFrame): forecast data
-            actuals (pd.DataFrame): actual data
-            target (str): target column
-        Returns:
-            list: list with MAPE values for each week
-        """
+    Calculate the Mean Absolute Percentage Error (MAPE) for each week
+    Args:
+        prediction (pd.DataFrame): forecast data
+        actuals (pd.DataFrame): actual data
+        target (str): target column
+    Returns:
+        list: list with MAPE values for each week
+    """
     # Convert 'Date' columns to datetime if they aren't already
     prediction['Date'] = pd.to_datetime(prediction['Date'])
     actuals['Date'] = pd.to_datetime(actuals['Date'])
@@ -87,13 +90,12 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
 
 
 def plot_model_comparison(
-    model_names: list,
-    model_forecasts: list,
-    actuals: pd.DataFrame,
-    forecast_horizon: int,
-    target: str,
-    top: pd.DataFrame = None,
-):
+        model_names: list,
+        model_forecasts: list,
+        actuals: pd.DataFrame,
+        forecast_horizon: int,
+        target: str,
+        top: pd.DataFrame = None) -> None:
     """
     Plot the Mean Absolute Percentage Error (MAPE) for each model by month
     Args:
@@ -136,7 +138,7 @@ def plot_model_comparison(
     colors = ['#e854dc', '#ff7404', 'royalblue']
 
     for i, model in enumerate(model_names):
-        ax.bar(indices + i * bar_width, iteration_mapes[:, i], width=bar_width, label=model,color=colors[i])
+        ax.bar(indices + i * bar_width, iteration_mapes[:, i], width=bar_width, label=model, color=colors[i])
 
     ax.set_xlabel('Month')
     ax.set_ylabel('Mean MAPE')
@@ -149,11 +151,11 @@ def plot_model_comparison(
 
 
 def transform_predictions_to_pandas(
-    predictions: list,
-    target: str,
-    pred_list: list,
-    quantiles: list,
-    convert: bool = True,
+        predictions: list,
+        target: str,
+        pred_list: list,
+        quantiles: list,
+        convert: bool = True,
 ) -> pd.DataFrame:
     """
     Receives as list of predictions and transform it in a data frame
