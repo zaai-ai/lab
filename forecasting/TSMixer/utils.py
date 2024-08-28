@@ -8,6 +8,16 @@ import numpy as np
 
 def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, forecast_horizon: int,
                               dynamic_covariates_names) -> list:
+    """
+    Create dynamic covariates for each series in the training set
+    Args:
+        train_darts (list): list with training series
+        dataframe (pd.DataFrame): historical data
+        forecast_horizon (int): forecast horizon
+        dynamic_covariates_names (list): list with dynamic covariates names
+    Returns:
+        list: list with dynamic covariates for each series
+    """
     dynamic_covariates = []
 
     # Ensure the Date column is in datetime format in both dataframes
@@ -46,6 +56,15 @@ def create_dynamic_covariates(train_darts: list, dataframe: pd.DataFrame, foreca
 
 
 def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str) -> list:
+    """
+        Calculate the Mean Absolute Percentage Error (MAPE) for each week
+        Args:
+            prediction (pd.DataFrame): forecast data
+            actuals (pd.DataFrame): actual data
+            target (str): target column
+        Returns:
+            list: list with MAPE values for each week
+        """
     # Convert 'Date' columns to datetime if they aren't already
     prediction['Date'] = pd.to_datetime(prediction['Date'])
     actuals['Date'] = pd.to_datetime(actuals['Date'])
@@ -68,9 +87,21 @@ def mape_evaluation(prediction: pd.DataFrame, actuals: pd.DataFrame, target: str
 
 
 def plot_model_comparison(model_names, model_forecasts, actuals, forecast_horizon, target, top=None):
-    if len(model_forecasts) != len(model_names):
-        raise ValueError("The number of model forecasts must match the number of model names")
+    """
+    Plot the Mean Absolute Percentage Error (MAPE) for each model by month
+    Args:
+        model_names (list): list of model names
+        model_forecasts (list): list of model forecasts
+        actuals (pd.DataFrame): actual sales data
+        forecast_horizon (int): forecast horizon
+        target (str): target column
+        top (pd.DataFrame): top performing model
+    """
 
+    if len(model_forecasts) != len(model_names):
+        raise ValueError(
+            "The number of model forecasts must match the number of model names"
+        )
     num_windows = len(model_forecasts[0])
     iteration_mapes = np.zeros((forecast_horizon, len(model_names)))
 
@@ -118,6 +149,8 @@ def transform_predictions_to_pandas(predictions, target: str, pred_list: list, q
         predictions (list): list with predictions
         target (str): column to forecast
         pred_list (list): list with test df to extract time series id
+        quantiles (list): list with quantiles
+        convert (bool): convert negative predictions into 0 (default is True)
     Returns
         pd.DataFrame: data frame with date, forecast, forecast_lower, forecast_upper and id
         :param convert:
