@@ -1,0 +1,8 @@
+generator:
+  llama2:
+    llm_path: "model/nous-hermes-llama-2-7b.Q4_K_M.gguf"
+  llama3:
+    llm_path: "model/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf"
+  context_length: 1024
+  temperature: 0.7
+  max_tokens: 2000
