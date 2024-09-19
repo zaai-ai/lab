@@ -64,15 +64,20 @@ def get_gpt_rank(true_answer: str, llm_answers: dict, openai_key: str) -> dict:
     # get a formated output from OpenAI
     functions = define_open_ai_function()
 
+    # shuffle model names
     keys = list(llm_answers.keys())
     random.shuffle(keys)
 
+    # set prompt for GPT
     gpt_query = (f"Based on the correct answer: {true_answer}, rank the IDs of the following sixteen answers from the "
                  f"most to the least correct one:\n")
+
+    # add LLM answers to GPT prompt
     for idx, key in enumerate(keys):
         answer = re.sub("[^a-zA-Z0-9']+", ' ', llm_answers[key])
         gpt_query += f"        ID: {idx + 1} Answer: {answer}\n"
 
+    # make request to GPT
     completion = OpenAI(api_key=openai_key).chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": gpt_query}],
@@ -80,6 +85,8 @@ def get_gpt_rank(true_answer: str, llm_answers: dict, openai_key: str) -> dict:
         function_call={"name": "return_rank"},
     )
     response_message = completion.choices[0].message.function_call.arguments
+
+    # retrive the rank and convert into dict
     rank = ast.literal_eval(response_message)["rank"].split(",")
     if len(rank) == 1:
         rank = list(rank[0])
