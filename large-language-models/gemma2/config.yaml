@@ -1,0 +1,8 @@
+generator:
+  gemma:
+    llm_path: "model/gemma-7b-it-Q4_K_M.gguf"
+  gemma2:
+    llm_path: "model/gemma-2-9b-it-Q4_K_M.gguf"
+  context_length: 1024
+  temperature: 0.7
+  max_tokens: 2000
