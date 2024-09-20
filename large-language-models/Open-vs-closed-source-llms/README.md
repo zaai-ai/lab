@@ -22,6 +22,11 @@
 
     ├── Open-vs-closed-source-llms
     │
+    ├── assets/
+    │   ├── RAQ.csv                                           <- meta data information
+    │   ├── model_answers.csv                                 <- model answers and respective questions and context
+    │   └── RAQ_results.csv                                   <- meta data information and RAQ
+    │
     ├────────── env                                           <- env files
     │
     │────────── open-vs-closed-source-llms.ipynb              <- notebook
