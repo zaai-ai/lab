@@ -1,0 +1,12 @@
+datasetsforecast==0.0.8
+neuralforecast==1.7.3
+pandas==2.1.4
+statsforecast==1.7.0
+numpy==1.26.2
+torch == 2.2.1
+scikit-learn==1.3.2
+timesfm==1.1.0
+jaxlib==0.4.26
+jax
+mlforecast
+autogluon
