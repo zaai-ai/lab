@@ -1,0 +1,2 @@
+crewai==0.80.0
+youtube-transcript-api==0.6.2

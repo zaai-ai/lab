@@ -1,0 +1,33 @@
+research_task:
+  description: >
+    Conduct a thorough research about {topic}
+    Make sure you find any interesting and relevant youtube links given
+    the current year is 2024.
+  expected_output: >
+    A list with youtube URLs that cover {topic} and the respective description
+    with the most relevant information about {topic}. Ignore any links that don't
+    start with "https://www.youtube.com".
+  agent: researcher
+
+summarize_task:
+  description: >
+    Analyse the information about the {topic} thoroughly to extract the most valuable insights, facts, and recommendations.
+    Adhere strictly to the provided schema when extracting information from the input content.
+    Ensure that the output matches the field descriptions, types and constraints exactly. Ignore any links that don't
+    start with "https://www.youtube.com".
+  expected_output: >
+    A json with a summary of the {topic} and the most valuable insights, facts, and recommendations. Also add the
+    youtube links as references.
+  agent: summarizer
+
+write_task:
+  description: >
+    Review the context you got and expand each topic into a full section for a blog post.
+    Make sure the blog post is detailed and contains any and all relevant information.
+    The blog post must contain an introduction, a body, a code example and a conclusion section.
+  expected_output: >
+    A fully-fledged blog post with the main topics, each presented as a complete section of information.
+    Format it as HTML without using '```'. Make it look like a professional tech blog website,
+    including a navbar, menu, and styling. Incorporate YouTube links as clickable references within
+    the text and at the end.
+  agent: blog_writer
