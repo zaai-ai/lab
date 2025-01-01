@@ -9,6 +9,7 @@ import os
 from dotenv import load_dotenv
 from PIL import Image, ImageDraw
 
+
 ############################################
 # 1) Environment Setup
 ############################################
@@ -194,8 +195,7 @@ def open_chrome(url: str):
 
 def find_and_click_lab_element(bounding_box_data: dict):
     """
-    Click the bounding box that should lead to the 'Lab'
-    (or blog page).
+    Click the bounding box that should lead to the 'Lab' (or blog page).
     For simplicity, let's assume we pick the bounding box whose label
     or description references "Lab" or "Blog"
     """
