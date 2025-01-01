@@ -1,0 +1,4 @@
+pyautogui==0.9.54
+google-generativeai==0.8.3
+pillow==10.3.0
+python-dotenv==1.0.0
