@@ -14,19 +14,19 @@ from PIL import Image, ImageDraw
 # 1) Environment Setup
 ############################################
 
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise ValueError("API key not found. Please set GEMINI_API_KEY in your .env file.")
-
-genai.configure(api_key=api_key)
-
 CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 SCREENSHOT_PATH = "assets/zaai_homepage.png"
 SCREENSHOT_BBOXED_PATH = "assets/zaai_homepage_bboxed.png"
 SCREENSHOT_BLOG_PATH = "assets/zaai_lab.png"
 
 ZAAI_URL = "https://zaai.ai"
+
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise ValueError("API key not found. Please set GEMINI_API_KEY in your .env file.")
+
+genai.configure(api_key=api_key)
 
 
 ############################################
@@ -72,6 +72,10 @@ def update_coordinates_to_pixels(detection_info: dict, width: int, height: int) 
         ]
 
 
+############################################
+# 3) Tool Functions
+############################################
+
 def draw_bounding_boxes(image_path: str, detection_info: dict, output_path: str, color: str = "red") -> None:
     """
     Draw bounding boxes on the image and save to output_path.
@@ -102,8 +106,47 @@ def take_screenshot(output_path: str):
     print(f"Screenshot saved to {output_path}.")
 
 
+def open_chrome(url: str):
+    """Open Chrome to a specific URL using a subprocess."""
+    print(f"Opening Chrome at {url} ...")
+    subprocess.Popen([CHROME_PATH, url])
+    time.sleep(5)
+
+
+def find_and_click_lab_element(bounding_box_data: dict):
+    """
+    Click the bounding box that should lead to the 'Lab' (or blog page).
+    For simplicity, let's assume we pick the bounding box whose label
+    or description references "Lab" or "Blog"
+    """
+    target_label = None
+    for label, info in bounding_box_data.items():
+        lower_desc = info["description"].lower()
+        lower_label = label.lower()
+        if "lab" in lower_desc or "lab" in lower_label:
+            target_label = label
+            break
+        if "blog" in lower_desc or "blog" in lower_label:
+            target_label = label
+            break
+
+    if not target_label:
+        print("Could not find a bounding box that references Lab/Blog in the description.")
+        return
+
+    coords = bounding_box_data[target_label]["coordinates"]
+    # coords is [xmin, ymin, xmax, ymax]
+    # let's pick the down left corner of the bb
+    x_center = coords[0] / 2 # bc of retina res
+    y_center = coords[1] / 2 # bc of retina res
+
+    print(f"Clicking element: {target_label}")
+    pyautogui.moveTo(x_center, y_center, duration=0.5)
+    pyautogui.click()
+
+
 ############################################
-# 3) Vision Agent Steps
+# 4) Vision Agent Steps
 ############################################
 
 def identify_elements_with_descriptions(image_path: str) -> list:
@@ -161,7 +204,7 @@ def propose_bounding_boxes(image_path: str, identified_elements: list) -> dict:
     The following clickable elements were identified (labels + descriptions):
     {elements_json_str}
 
-    Propose a bounding box (in [xmin, ymin, xmax, ymax], 0..1000 scale) for each element 
+    Propose a bounding box (in [xmin, ymin, xmax, ymax], 0..1000 scale) for each element
     so we can locate them on the screenshot.
 
     Output JSON in the format:
@@ -182,48 +225,6 @@ def propose_bounding_boxes(image_path: str, identified_elements: list) -> dict:
     parsed_data = extract_json_from_response(response)
     return parsed_data
 
-############################################
-# 4) High-Level Flow
-############################################
-
-def open_chrome(url: str):
-    """Open Chrome to a specific URL using a subprocess."""
-    print(f"Opening Chrome at {url} ...")
-    subprocess.Popen([CHROME_PATH, url])
-    time.sleep(5)
-
-
-def find_and_click_lab_element(bounding_box_data: dict):
-    """
-    Click the bounding box that should lead to the 'Lab' (or blog page).
-    For simplicity, let's assume we pick the bounding box whose label
-    or description references "Lab" or "Blog"
-    """
-    target_label = None
-    for label, info in bounding_box_data.items():
-        lower_desc = info["description"].lower()
-        lower_label = label.lower()
-        if "lab" in lower_desc or "lab" in lower_label:
-            target_label = label
-            break
-        if "blog" in lower_desc or "blog" in lower_label:
-            target_label = label
-            break
-
-    if not target_label:
-        print("Could not find a bounding box that references Lab/Blog in the description.")
-        return
-
-    coords = bounding_box_data[target_label]["coordinates"]
-    # coords is [xmin, ymin, xmax, ymax]
-    # let's pick the down left corner of the bb
-    x_center = coords[0] / 2 # bc of retina res
-    y_center = coords[1] / 2 # bc of retina res
-
-    print(f"Clicking element: {target_label}")
-    pyautogui.moveTo(x_center, y_center, duration=0.5)
-    pyautogui.click()
-
 
 def retrieve_latest_blog_info(image_path: str) -> (str, str):
     """
@@ -235,7 +236,7 @@ def retrieve_latest_blog_info(image_path: str) -> (str, str):
     prompt = """
     You are given a screenshot of a website blog page.
     Identify the latest article and get its title and date.
-    
+
     Output JSON in this format:
     {
       "title": "title of the article",
