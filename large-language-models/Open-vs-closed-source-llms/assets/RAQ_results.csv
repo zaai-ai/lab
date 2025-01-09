@@ -1,0 +1,17 @@
+Date,Model,RAQ,Type
+2023-07-18,llama2_70b,12.546875,Open-Source Models
+2024-06-16,yi,9.103125,Open-Source Models
+2024-03-27,dbrx,10.859375,Open-Source Models
+2024-02-21,gemma_7b,11.35,Open-Source Models
+2023-09-27,mistral7b,8.9375,Open-Source Models
+2023-12-11,mixtral8x7b,7.959375,Open-Source Models
+2024-04-17,mixtral8x22b,8.078125,Open-Source Models
+2024-04-18,llama3_70b,9.29375,Open-Source Models
+2024-07-23,llama3_1_70b,8.590625,Open-Source Models
+2024-07-23,llama3_1_405b,7.8375,Open-Source Models
+2023-11-06,gpt_3_5_turbo,8.98125,Closed-Source Models
+2023-11-06,gpt_4_turbo,8.734375,Closed-Source Models
+2024-06-20,claude_3_5_sonnet,7.725,Closed-Source Models
+2024-03-04,claude_3_oppus,8.378125,Closed-Source Models
+2024-05-24,gemini_1_5_flash,10.56875,Closed-Source Models
+2024-02-15,gemini_1_0_pro,8.878125,Closed-Source Models
