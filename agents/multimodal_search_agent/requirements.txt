@@ -1,0 +1,9 @@
+langchain_core==0.3.32
+langchain_google_vertexai==2.0.12
+streamlit==1.41.1
+langchain_postgres==0.0.12
+langchain_huggingface==0.1.2
+transformers==4.48.1
+torch==2.5.1
+pillow==11.1.0
+psycopg2-binary==2.9.10
