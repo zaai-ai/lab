@@ -11,12 +11,9 @@ class ClassifierOutput(BaseModel):
     """
 
     category: list = Field(
-        description="A list of clothes category to search for ('t-shirt', 'pants', 'shoes', 'jersey', 'shirt')."  #'complete_outfit'
+        description="A list of clothes category to search for ('t-shirt', 'pants', 'shoes', 'jersey', 'shirt')."
     )
     number_of_items: int = Field(description="The number of items we should retrieve.")
-
-
-# - complete_outfit if the customer is looking for a complete outfit.
 
 
 class Classifier:
