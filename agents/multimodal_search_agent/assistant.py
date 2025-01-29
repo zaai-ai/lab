@@ -5,14 +5,13 @@ from pydantic import BaseModel, Field
 
 
 # Define pydantic class with desired data structure
-class Assistant(BaseModel):
+class AssistantOutput(BaseModel):
     """
     Data structure for the model's output.
     """
 
-    answer: str = Field(
-        description="A string with the fashion advice for the customer."
-    )
+    answer: str = Field(description="A string with the fashion advice for the customer.")
+
 
 class Assistant:
     """
@@ -27,21 +26,24 @@ class Assistant:
         """
         super().__init__()
 
-        parser = PydanticOutputParser(pydantic_object=Assistant)
+        parser = PydanticOutputParser(pydantic_object=AssistantOutput)
 
         text_prompt = """
-        You are a fashion assistant expert on understanding what a customer needs and on providing recommendations based on the items and customer message below.
-        Items:
+        You work for a fashion store and you are a fashion assistant expert on understanding what a customer needs.
+        Based on the items that are available in the store and the customer message below, provide a fashion advice for the customer.
+        Number of items: {number_of_items}
+        
+        Images of items:
         {items}
 
         Customer message:
         {customer_message}
 
         Instructions:
-        1. Read carefully the items metadata.
+        1. Check carefully the images provided.
         2. Read carefully the customer needs.
         3. Provide a fashion advice for the customer based on the items and customer message.
-        3. Return a valid JSON with the advice, the key must be 'answer' and the value must be a string with your advice.
+        4. Return a valid JSON with the advice, the key must be 'answer' and the value must be a string with your advice.
 
         Provide the output as a valid JSON object without any additional formatting, such as backticks or extra text. Ensure the JSON is correctly structured according to the schema provided below.
         {format_instructions}
@@ -54,16 +56,17 @@ class Assistant:
         )
         self.chain = prompt | model | parser
 
-    def get_advice(self, text: str, items: dict) -> Assistant:
+    def get_advice(self, text: str, items: list, number_of_items: int) -> AssistantOutput:
         """
         Get advice from the model based on the text and items context.
         Args:
             text (str): user message.
-            items (dict): items found for the customer.
+            items (list): items found for the customer.
+            number_of_items (int): number of items to be retrieved.
         Returns:
-            Assistant: The model's answer.
+            AssistantOutput: The model's answer.
         """
         try:
-            return self.chain.invoke({"customer_message": text, "items": items})
+            return self.chain.invoke({"customer_message": text, "items": items, "number_of_items": number_of_items})
         except Exception as e:
             raise RuntimeError(f"Error invoking the chain: {e}")
