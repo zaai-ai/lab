@@ -64,7 +64,7 @@ class YouTubeTranscriptTool(BaseTool):
         Runs the YouTubeTranscriptTool with the given parameters.
 
         Args:
-            video_url (list[str]): The list of YouTube video URLs to fetch the transcript for.
+            video_url (list[str]): The list of YouTube video URLs to fetch the transcript for and do have subtitles enabled.
             language (Optional[str]): The language code for the transcript (e.g., 'en' for English).
 
         Returns:

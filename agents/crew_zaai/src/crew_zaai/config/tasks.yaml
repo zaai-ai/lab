@@ -2,10 +2,10 @@ research_task:
   description: >
     Conduct a thorough research about {topic}
     Make sure you find any interesting and relevant youtube links given
-    the current year is 2024.
+    the current year is 2025.
   expected_output: >
     A list with youtube URLs that cover {topic} and the respective description
-    with the most relevant information about {topic}. Ignore any links that don't
+    with the most relevant information about {topic}. and do have subtitles enabled.Ignore any links that don't
     start with "https://www.youtube.com".
   agent: researcher
 
@@ -22,12 +22,19 @@ summarize_task:
 
 write_task:
   description: >
-    Review the context you got and expand each topic into a full section for a blog post.
-    Make sure the blog post is detailed and contains any and all relevant information.
-    The blog post must contain an introduction, a body, a code example and a conclusion section.
+    Review the context you got and craft engaging LinkedIn posts for each key topic.
+    Each post should be concise, insightful, and tailored for a professional audience on LinkedIn.
+    The LinkedIn post series must include an introductory post, several posts covering each main topic, a post with a code example (if relevant and simplified for LinkedIn), and a concluding post.
   expected_output: >
-    A fully-fledged blog post with the main topics, each presented as a complete section of information.
-    Format it as HTML without using '```'. Make it look like a professional tech blog website,
-    including a navbar, menu, and styling. Incorporate YouTube links as clickable references within
-    the text and at the end.
-  agent: blog_writer
+    A series of structured LinkedIn post drafts, one for each topic.
+    Format each post as text, optimized for LinkedIn's platform.
+    Note: Please shorten your post and try again. Max 3000 characters.
+    Focus on:
+      - Engaging opening lines to grab attention.
+      - Concise bullet points or short paragraphs for key information.
+      - Relevant hashtags for discoverability.
+      - A professional yet approachable tone.
+      - A clear call to action or question to encourage engagement (optional).
+    Avoid using '```' and aim for a professional, LinkedIn-style presentation.
+  agent: linkedin_post_writer # Agent designed to write LinkedIn posts
+ 

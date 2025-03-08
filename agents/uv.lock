@@ -1,0 +1,19 @@
+version = 1
+revision = 1
+requires-python = ">=3.10"
+
+[manifest]
+members = [
+    "agents",
+    "crew-zaai",
+]
+
+[[package]]
+name = "agents"
+version = "0.1.0"
+source = { virtual = "." }
+
+[[package]]
+name = "crew-zaai"
+version = "0.1.0"
+source = { virtual = "crew_zaai" }
