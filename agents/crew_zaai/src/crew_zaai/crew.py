@@ -1,8 +1,11 @@
-import os
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crew_zaai.src.crew_zaai.tools.searx import SearxSearchTool
-from crew_zaai.src.crew_zaai.tools.youtube import YouTubeTranscriptTool
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))) # Add current directory of crew.py to path
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')) # Add parent directory (src) to path, assuming 'tools' is in 'src'
+from tools.searx import SearxSearchTool
+from tools.youtube import YouTubeTranscriptTool
 
 
 @CrewBase
@@ -31,8 +34,8 @@ class CrewZaai:
         )
 
     @agent
-    def blog_writer(self) -> Agent:
-        return Agent(config=self.agents_config["blog_writer"], verbose=True)
+    def linkedin_post_writer(self) -> Agent:
+        return Agent(config=self.agents_config["linkedin_post_writer"], verbose=True)
 
     @task
     def research_task(self) -> Task:
