@@ -1,0 +1,17 @@
+Date,Model,Type
+2023-07-18,llama2_70b,Open-Source Models
+2024-06-16,yi,Open-Source Models
+2024-03-27,dbrx,Open-Source Models
+2024-02-21,gemma_7b,Open-Source Models
+2023-09-27,mistral7b,Open-Source Models
+2023-12-11,mixtral8x7b,Open-Source Models
+2024-04-17,mixtral8x22b,Open-Source Models
+2024-04-18,llama3_70b,Open-Source Models
+2024-07-23,llama3_1_70b,Open-Source Models
+2024-07-23,llama3_1_405b,Open-Source Models
+2023-11-06,gpt_3_5_turbo,Closed-Source Models
+2023-11-06,gpt_4_turbo,Closed-Source Models
+2024-06-20,claude_3_5_sonnet,Closed-Source Models
+2024-03-04,claude_3_oppus,Closed-Source Models
+2024-05-24,gemini_1_5_flash,Closed-Source Models
+2024-02-15,gemini_1_0_pro,Closed-Source Models
