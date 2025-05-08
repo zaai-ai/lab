@@ -1,0 +1,9 @@
+langchain==0.1.11
+python-dotenv==1.0.0
+jupyterlab==4.0.8
+pandas==2.0.0
+llama-cpp-python==0.2.82
+seaborn==0.13.1
+openai==1.35.4
+datasets==2.15.0
+scikit-posthocs==0.9.0
