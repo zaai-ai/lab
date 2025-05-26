@@ -2,14 +2,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
 
 
 class VAE(nn.Module):
-    def __init__(self, input_dim=20, latent_dim=50):
+    def __init__(self, input_dim, latent_dim=50):
         super(VAE, self).__init__()
         self.input_length = input_dim
 
@@ -17,7 +13,7 @@ class VAE(nn.Module):
             nn.Conv1d(1, 16, kernel_size=5, stride=2, padding=2),  # [B, 16, L/2]
             nn.ReLU(),
             nn.Conv1d(16, 32, kernel_size=5, stride=2, padding=2),  # [B, 32, L/4]
-            nn.ReLU()
+            nn.ReLU(),
         )
 
         conv_output_size = self.input_length // 4
@@ -29,10 +25,10 @@ class VAE(nn.Module):
         self.fc_z = nn.Linear(latent_dim, self.flatten_dim)
 
         self.decoder = nn.Sequential(
-            nn.ConvTranspose1d(32, 16, kernel_size=4, stride=2, padding=1),  # upsample to L/2
+            nn.ConvTranspose1d(32, 16, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
-            nn.ConvTranspose1d(16, 1, kernel_size=4, stride=2, padding=1),  # upsample to L
-            nn.Tanh()
+            nn.ConvTranspose1d(16, 1, kernel_size=4, stride=2, padding=1),
+            # nn.Tanh(),
         )
 
     def encode(self, x):
@@ -58,27 +54,49 @@ class VAE(nn.Module):
         return self.decode(z), mu, logvar
 
 
-latent_dim=10
-vae = VAE(latent_dim=latent_dim, input_dim=100)
-optimizer = optim.Adam(vae.parameters(), lr=1e-3)
-
-
-def vae_loss(recon_x, x, mu, logvar, beta=0.001):
-    recon_loss = nn.functional.mse_loss(recon_x, x, reduction='sum')
+def vae_loss(recon_x, x, mu, logvar, beta):
+    recon_loss = nn.functional.mse_loss(recon_x, x, reduction="mean")
     kl_div = -0.5 * torch.mean(1 + logvar - mu.pow(2) - logvar.exp())
     return recon_loss + beta * kl_div
 
 
-def vae_train_eval(dataloader, t, segment_size):
+def overlap_add_reconstruction(reconstructed_segments, segment_length=60, stride=1):
+    num_segments, seg_len = reconstructed_segments.shape
+    full_length = (num_segments - 1) * stride + seg_len
+
+    recon = np.zeros(full_length)
+    counts = np.zeros(full_length)
+
+    for i, segment in enumerate(reconstructed_segments):
+        start = i * stride
+        end = start + segment_length
+        recon[start:end] += segment
+        counts[start:end] += 1
+
+    # avoid divide-by-zero
+    return recon / np.maximum(counts, 1e-8)
+
+
+def vae_train_eval(
+    dataloader,
+    vae,
+    segment_length,
+    prior_ratio=0.3,  # x% of the time pick a pure prior sample
+    beta_max=1.0,
+    warmup_epochs=100,
+    epochs=1000,
+):
+    optimizer = optim.Adam(vae.parameters(), lr=1e-3)
     vae.train()
-    for epoch in range(1000):
+    for epoch in range(epochs):
         epoch_loss = 0.0
         num_batches = 0
+        beta = beta_max * min(1.0, max(0.0, (epoch - warmup_epochs) / epochs))
         for batch in dataloader:
             x = batch[0]
             optimizer.zero_grad()
             recon, mu, logvar = vae(x)
-            loss = vae_loss(recon, x, mu, logvar)
+            loss = vae_loss(recon, x, mu, logvar, beta)
             loss.backward()
             optimizer.step()
 
@@ -93,9 +111,20 @@ def vae_train_eval(dataloader, t, segment_size):
 
     vae.eval()
     with torch.no_grad():
-        z = torch.randn(len(t) // segment_size, latent_dim)
-        vae_samples = vae.decode(z).numpy()
-        vae_ts = np.concatenate(vae_samples)
+        vae_samples_agg = []
+        for batch in dataloader:
+            x = batch[0]
+            recon, mu, logvar = vae(x)
+            z_post = vae.reparameterize(mu, logvar)
+            z_prior = torch.randn_like(z_post)
+            mask = torch.rand(z_post.size(0), 1) < prior_ratio
+            z = torch.where(mask, z_prior, z_post)
+
+            vae_samples = vae.decode(z).cpu().numpy()
+            vae_samples_agg.append(vae_samples)
+        vae_ts = np.concatenate(vae_samples_agg)
+    vae_ts = overlap_add_reconstruction(vae_ts, segment_length=segment_length, stride=1)
+
     # vae.eval()
     # with torch.no_grad():
     #     for batch in dataloader:
@@ -108,4 +137,3 @@ def vae_train_eval(dataloader, t, segment_size):
     #         plt.show()
 
     return vae_ts
-
